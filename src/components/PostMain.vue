@@ -1,4 +1,7 @@
         <script>
+import axios from "axios";
+import PostCard from "./PostCard.vue";
+
 export default {
   name: "PostMain",
   data() {
@@ -6,26 +9,102 @@ export default {
       posts: [],
       loading: true,
       baseUrl: "http://127.0.0.1:8000",
+      currentPage: 1,
+      lastPage: null,
     };
   },
+
+  components: {
+    PostCard,
+  },
+
   methods: {
-    getPosts() {
+    getPosts(post_page) {
       this.loading = true;
-      axios.get(`${this.baseUrl}/api/posts`).then((response) => {
-        this.post = response.data.results;
-        this.loading = false;
-      });
+      axios
+        .get(`${this.baseUrl}/api/posts`, { params: { page: post_page } })
+        .then((response) => {
+          // this.posts = response.data.results.data;
+
+          this.posts = response.data.results.data;
+          this.currentPage = response.data.results.data.current_page;
+          this.lastPage = response.data.results.data.last_page;
+          this.loading = false;
+        });
     },
+  },
+  mounted() {
+    this.getPosts(this.currentPage);
   },
 };
 </script>
 
 <template lang="">
     <div>
-        
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="text-center">Vite-Boolfolio</h2>
+                </div>
+                <div class="col-12">
+                   <div v-if="loading" class="col-12 justify-content-center">
+                    <div class="loader"></div>
+                </div>
+                <div v-else class="d-flex justify-content-center flex-wrap">
+                    <div class="card" v-for="post in posts" :key="post.id">
+                        <PostCard :post="post" :baseUrl="baseUrl"/>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <nav>
+                                <ul class="pagination">
+
+
+                                    <li :class="currentPage === 1 ? 'disabled' : 'page-item'">
+                                        <button class="page-link"
+                                        @click="getPosts(currentPage - 1)">Prev</button>
+                                    </li>
+
+
+                                    <li :class="currentPage === i ? 'disabled' : 'page-item'" v-for="i in lastPage" >
+                                        <button class="page-link" @click="getPosts(i)">{{i}}</button>
+                                    </li>
+
+                                    <li :class="currentPage === lastPage ? 'disabled' : 'page-item'">
+                                        <button class="page-link" 
+                                        @click="getPosts(currentPage + 1)">Next</button>
+                                    </li>
+
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+            </div>
+        </div>
     </div>
 </template>
 
 
 <style lang="scss" scoped>
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 </style>
