@@ -1,9 +1,15 @@
         <script>
+import { store } from "../store.js";
+
 export default {
   name: "PostCard",
   props: {
     post: Object,
-    baseUrl: String,
+  },
+  data() {
+    return {
+      store,
+    };
   },
 };
 </script>
@@ -26,7 +32,8 @@ export default {
                             <div class="card-text">
                                 {{post.excerpt}}
                             </div>
-                            <a href="#" class="btn">Leggi articolo</a>  
+                            <!-- <a href="" class="btn">Leggi articolo</a>   -->
+                            <router-link :to="{name: 'single-post', params: { slug: post.slug}}" class="btn" >Leggi L'articolo</router-link>
                         </div>
     </div>
 </template>

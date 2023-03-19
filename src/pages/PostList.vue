@@ -1,16 +1,19 @@
-        <script>
+<script>
 import axios from "axios";
-import PostCard from "./PostCard.vue";
+
+import { store } from "../store";
+
+import PostCard from "../components/PostCard.vue";
 
 export default {
-  name: "PostMain",
+  name: "PostList",
   data() {
     return {
+      store,
       posts: [],
-      loading: true,
-      baseUrl: "http://127.0.0.1:8000",
       currentPage: 1,
       lastPage: null,
+      loading: true,
     };
   },
 
@@ -22,7 +25,9 @@ export default {
     getPosts(post_page) {
       this.loading = true;
       axios
-        .get(`${this.baseUrl}/api/posts`, { params: { page: post_page } })
+        .get(`${this.store.baseUrl}/api/stores`, {
+          params: { page: store_page },
+        })
         .then((response) => {
           // this.posts = response.data.results.data;
 
@@ -52,7 +57,7 @@ export default {
                 </div>
                 <div v-else class="d-flex justify-content-center flex-wrap">
                     <div class="card" v-for="post in posts" :key="post.id">
-                        <PostCard :post="post" :baseUrl="baseUrl"/>
+                        <PostCard :post="post"/>
                     </div>
                     <div class="row">
                         <div class="col-12">
@@ -90,21 +95,4 @@ export default {
 
 
 <style lang="scss" scoped>
-.loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
 </style>
